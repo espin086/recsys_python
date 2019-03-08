@@ -29,7 +29,7 @@ class IMDBData:
         keep_vars = ['title', 'release_date', 
                           'budget', 'revenue', 
                           'runtime', 'genres', 
-                          'vote_count', 'vote_average'
+                          'vote_count', 'vote_average', 'overview'
                          ]
         narrow = raw[keep_vars]
         #converting datatypes
