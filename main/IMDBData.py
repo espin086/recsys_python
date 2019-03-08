@@ -14,24 +14,24 @@ import datetime
 
 class IMDBData:
     def __init__(self):
-        self.location = "../data/movies_metadata.csv"
+        self.location_raw = "../data/movies_metadata.csv"
         self.location_clean = "../data/movies_metadata_clean.csv"
-        self.keep_vars = ['title', 'release_date', 
-                          'budget', 'revenue', 
-                          'runtime', 'genres', 
-                          'vote_count', 'vote_average'
-                         ]
         self.current_time = datetime.datetime.now()
         pass
     
     def get_raw(self):
-        raw = pd.read_csv(self.location)
+        raw = pd.read_csv(self.location_raw)
         return raw
     
     def clean_raw(self):
         raw = self.get_raw()
         #filtering by select variables
-        narrow = raw[self.keep_vars]
+        keep_vars = ['title', 'release_date', 
+                          'budget', 'revenue', 
+                          'runtime', 'genres', 
+                          'vote_count', 'vote_average'
+                         ]
+        narrow = raw[keep_vars]
         #converting datatypes
         def to_float(x):
             try:
@@ -44,10 +44,12 @@ class IMDBData:
         narrow['release_date'] = pd.to_datetime(narrow['release_date'], errors='coerce')
         #extract year from the datetime
         narrow['year'] = narrow['release_date'].apply(lambda x: str(x).split('-')[0] if x != np.nan else np.nan)
+        narrow = narrow[(narrow['runtime'] >= 45) & (narrow['runtime'] <= 300)]
         return narrow
     
     def save_clean(self):
         df = self.clean_raw()
+        df['saved_on'] = self.current_time
         df = df.to_csv(self.location_clean, index=False)
         print("INFO: saved to {0}".format(self.location_clean))
         return None
@@ -84,7 +86,7 @@ def main():
 # In[118]:
 
 if __name__ == '__main__':
-    main()
+    IMDBData().save_clean()
 
 
 
