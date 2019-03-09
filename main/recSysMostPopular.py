@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import datetime
 
-from IMDBData import IMDBData
 
 class recSysIMDBTop250:
 	def __init__(self,location_clean, avg_metric, count_metric):
@@ -26,14 +25,15 @@ class recSysIMDBTop250:
 
 		return df
 
-recommendation = recSysIMDBTop250(
-	location_clean="../data/movies_metadata_clean.csv", 
-	avg_metric='vote_average', 
-	count_metric='vote_count'
-	).get_imdb_recsys()
 
-print('*' * 80)
-print("YOUR MOVIE RECOMMENDATIONS")
-print('*' * 80)
-print(recommendation.to_string(index=False))
-print('*' * 80)
+if __name__ == '__main__':
+ 
+    recommendation = recSysIMDBTop250(
+    	location_clean="../data/merged_clean.csv", 
+    	avg_metric='vote_average', 
+    	count_metric='vote_count').get_imdb_recsys()
+    print('*' * 80)
+    print("YOUR MOVIE RECOMMENDATIONS")
+    print('*' * 80)
+    print(recommendation.to_string(index=False))
+    print('*' * 80)

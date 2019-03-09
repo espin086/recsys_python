@@ -1,31 +1,31 @@
-import pandas as pd 
-import numpy as np 
-#Import TfIdfVectorizer from scikit-learn
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import linear_kernel
-import sys
-import os
+import pandas as pd
+from ast import literal_eval
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-class recSysContent:
+
+class recSysMetaData:
 	def __init__(self):
 		self.location_clean = "../data/merged_clean.csv"
-		self.model_location = "../model_output/content_model_output.txt"
+		self.model_location = "../model_output/metadata_model_output.txt"
 		self.df = pd.read_csv(self.location_clean)
+		self.count = CountVectorizer(stop_words='english')
 
+	def build_model(self):
+		df = self.df
+		def create_soup(df):
+			soup = ''.join(df['keywords']) + " " \
+				+ ''.join(df['genres'])+ " " \
+				+ ''.join(df['cast']) + " " \
+				# + ''.join(df['director'])
+			return soup
 
-	def build_model(self,save=False):
-		#transform data into tdidf matrix
-		tfidf = TfidfVectorizer(stop_words='english')
-		self.df['overview'] = self.df['overview'].fillna('')
-		tfidf_matrix = tfidf.fit_transform(self.df['overview'])
-		#calculate the similarity distance
-		cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
-		
-		if save == True:
-			print("INFO: saving model to {0}".format(self.model_location))
-			np.savetxt(self.model_location, cosine_sim)
-		else:
-			print("INFO: model saved in memory and not locally")
+		df['soup'] = df.apply(create_soup, axis=1)
+		count_matrix = self.count.fit_transform(df['soup'])
+		#compute cosine similarity 
+		cosine_sim = cosine_similarity(count_matrix, count_matrix)
+		df = df.reset_index()
+		indices = pd.Series(df.index, index=df['title'])
 		return cosine_sim
 
 
@@ -39,16 +39,16 @@ class recSysContent:
 
 		"""
 		1) get the pairwise similarty scores of all movies with index based on 
-			title lookup 
+		title lookup 
 		2) Convert result into a list of tuples where the first element 
-			is the position  and the second is the similarity score
+		is the position  and the second is the similarity score
 		3)  
-
+		
 		"""
 		sim_scores = list(enumerate(cosine_sim[idx]))
 		"""
 		sort the tuple based on similarity scores in descending order based on second
-			element x[1] which in this case is the similarit score
+		element x[1] which in this case is the similarit score
 		"""
 		sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 		#get the top 10 most similar movies, ignoring the first which is always the title selected
@@ -61,12 +61,9 @@ class recSysContent:
 
 
 def main(title):
-	recommendations = recSysContent().recommend(title=title)
+	recommendations = recSysMetaData().recommend(title='The Lion King')
 	print(recommendations)
-	return None
+	return 
 
 
-if __name__ == '__main__':
-	title = "Toy Story"
-	main(title)
-
+print(recSysMetaData().recommend(title='The Lion King'))
