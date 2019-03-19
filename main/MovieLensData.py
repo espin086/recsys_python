@@ -26,11 +26,11 @@ class MovieLensData:
 		return items
 
 	def get_ratings(self):
-		keep_vars = ['user_id', 'movie_id', 'rating']
+		keep_vars = ['user_id', 'movie_id', 'rating', 'timestamp']
 		ratings = pd.read_csv("{0}/u.data".format(self.location_raw), sep='\t', names=keep_vars, encoding='latin-1')
 		return ratings
 
 
-
 if __name__ == '__main__':
-	MovieLensData().get_ratings()
+	ratings = MovieLensData().get_ratings()
+	print(ratings)
