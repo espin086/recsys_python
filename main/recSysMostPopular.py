@@ -37,3 +37,4 @@ if __name__ == '__main__':
     print('*' * 80)
     print(recommendation.to_string(index=False))
     print('*' * 80)
+	
